@@ -1113,11 +1113,11 @@ the original request.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://drafts.aaronpk.com/draft-parecki-oauth-jwt-grant-interaction-response/draft-parecki-oauth-jwt-grant-interaction-response.html">https://drafts.aaronpk.com/draft-parecki-oauth-jwt-grant-interaction-response/draft-parecki-oauth-jwt-grant-interaction-response.html</a></span>.
+        The latest revision of this draft can be found at <span><a href="https://aaronpk.github.io/draft-parecki-oauth-jwt-grant-interaction-response/draft-parecki-oauth-jwt-grant-interaction-response.html">https://aaronpk.github.io/draft-parecki-oauth-jwt-grant-interaction-response/draft-parecki-oauth-jwt-grant-interaction-response.html</a></span>.
         Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-parecki-oauth-jwt-grant-interaction-response/">https://datatracker.ietf.org/doc/draft-parecki-oauth-jwt-grant-interaction-response/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        OAuth WG Working Group mailing list (<span><a href="mailto:oauth@ietf.org">mailto:oauth@ietf.org</a></span>),
+        Web Authorization Protocol Working Group mailing list (<span><a href="mailto:oauth@ietf.org">mailto:oauth@ietf.org</a></span>),
         which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/oauth/">https://mailarchive.ietf.org/arch/browse/oauth/</a></span>.
         Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/oauth/">https://www.ietf.org/mailman/listinfo/oauth/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
@@ -1287,21 +1287,21 @@ Grant request but determines that user interaction is required before
 an access token can be issued, it responds with an HTTP 200 response
 containing a JSON object with the following parameters:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-3-2">
-        <dt id="section-3-2.1">interaction_uri</dt>
+        <dt id="section-3-2.1"><code>interaction_uri</code></dt>
         <dd style="margin-left: 1.5em" id="section-3-2.2">
           <p id="section-3-2.2.1"><span class="bcp14">REQUIRED</span>. The URI that the client <span class="bcp14">MUST</span> launch (typically in the
 user's browser) to allow the user to interact with the authorization
 server. The URI <span class="bcp14">MUST</span> use the "https" scheme.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-2.3">interval</dt>
+<dt id="section-3-2.3"><code>interval</code></dt>
         <dd style="margin-left: 1.5em" id="section-3-2.4">
           <p id="section-3-2.4.1"><span class="bcp14">OPTIONAL</span>. The minimum number of seconds that the client <span class="bcp14">SHOULD</span>
 wait between polling requests to the token endpoint. If no value is
 provided, the default is 5 seconds.<a href="#section-3-2.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-2.5">expires_in</dt>
+<dt id="section-3-2.5"><code>expires_in</code></dt>
         <dd style="margin-left: 1.5em" id="section-3-2.6">
           <p id="section-3-2.6.1"><span class="bcp14">OPTIONAL</span>. The number of seconds after which the interaction URI
 and the associated authorization session will expire.<a href="#section-3-2.6.1" class="pilcrow">¶</a></p>
@@ -1331,7 +1331,7 @@ Content-Type: application/json
 the following error codes are specified for use with the JWT
 Authorization Grant Interaction Response in token endpoint responses:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-3.1-2">
-          <dt id="section-3.1-2.1">interaction_pending</dt>
+          <dt id="section-3.1-2.1"><code>interaction_pending</code></dt>
           <dd style="margin-left: 1.5em" id="section-3.1-2.2">
             <p id="section-3.1-2.2.1">The authorization request is still pending as the end user hasn't
 yet completed the user-interaction steps.  The
@@ -1342,14 +1342,14 @@ the <code>interval</code> parameter defined in <a href="#interaction-response" c
 and respect any increase in the polling interval required by the "slow_down" error.<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.1-2.3">slow_down</dt>
+<dt id="section-3.1-2.3"><code>slow_down</code></dt>
           <dd style="margin-left: 1.5em" id="section-3.1-2.4">
             <p id="section-3.1-2.4.1">A variant of <code>authorization_pending</code>, the authorization request is
 still pending and polling should continue, but the interval <span class="bcp14">MUST</span>
 be increased by 5 seconds for this and all subsequent requests.<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.1-2.5">access_denied</dt>
+<dt id="section-3.1-2.5"><code>access_denied</code></dt>
           <dd style="margin-left: 1.5em" id="section-3.1-2.6">
             <p id="section-3.1-2.6.1">The authorization request was denied.<a href="#section-3.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1373,7 +1373,7 @@ be increased by 5 seconds for this and all subsequent requests.<a href="#section
 endpoint as defined in <span>[<a href="#RFC7523" class="cite xref">RFC7523</a>]</span>, with the addition of an <span class="bcp14">OPTIONAL</span>
           <code>redirect_uri</code> parameter.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-4.1-2">
-          <dt id="section-4.1-2.1">redirect_uri</dt>
+          <dt id="section-4.1-2.1"><code>redirect_uri</code></dt>
           <dd style="margin-left: 1.5em" id="section-4.1-2.2">
             <p id="section-4.1-2.2.1"><span class="bcp14">OPTIONAL</span>. The URI to which the authorization server will redirect
 the user's browser after the interaction is complete. The redirect

@@ -102,17 +102,17 @@ Grant request but determines that user interaction is required before
 an access token can be issued, it responds with an HTTP 200 response
 containing a JSON object with the following parameters:
 
-interaction_uri
+`interaction_uri`
 : REQUIRED. The URI that the client MUST launch (typically in the
   user's browser) to allow the user to interact with the authorization
   server. The URI MUST use the "https" scheme.
 
-interval
+`interval`
 : OPTIONAL. The minimum number of seconds that the client SHOULD
   wait between polling requests to the token endpoint. If no value is
   provided, the default is 5 seconds.
 
-expires_in
+`expires_in`
 : OPTIONAL. The number of seconds after which the interaction URI
   and the associated authorization session will expire.
 
@@ -136,7 +136,7 @@ In addition to the error codes defined in {{Section 3.2.3 of OAUTH-2.1}},
 the following error codes are specified for use with the JWT
 Authorization Grant Interaction Response in token endpoint responses:
 
-interaction_pending
+`interaction_pending`
 : The authorization request is still pending as the end user hasn't
   yet completed the user-interaction steps.  The
   client SHOULD repeat the access token request to the token endpoint.
@@ -145,12 +145,12 @@ interaction_pending
   the `interval` parameter defined in {{interaction-response}}, or 5 seconds if none was provided,
   and respect any increase in the polling interval required by the "slow_down" error.
 
-slow_down
+`slow_down`
 : A variant of `authorization_pending`, the authorization request is
   still pending and polling should continue, but the interval MUST
   be increased by 5 seconds for this and all subsequent requests.
 
-access_denied
+`access_denied`
 : The authorization request was denied.
 
 
@@ -163,7 +163,7 @@ The client makes a token request to the authorization server's token
 endpoint as defined in {{RFC7523}}, with the addition of an OPTIONAL
 `redirect_uri` parameter.
 
-redirect_uri
+`redirect_uri`
 : OPTIONAL. The URI to which the authorization server will redirect
   the user's browser after the interaction is complete. The redirect
   URI MUST be previously registered with the authorization server or

@@ -15,11 +15,11 @@ keyword:
  - jwt authorization grant
  - interaction
 venue:
-  group: OAuth WG
-  type: Working Group
-  mail: oauth@ietf.org
-  github: aaronpk/draft-parecki-oauth-jwt-grant-interaction-response
-  latest: https://drafts.aaronpk.com/draft-parecki-oauth-jwt-grant-interaction-response/draft-parecki-oauth-jwt-grant-interaction-response.html
+  group: "Web Authorization Protocol"
+  type: "Working Group"
+  mail: "oauth@ietf.org"
+  github: "aaronpk/draft-parecki-oauth-jwt-grant-interaction-response"
+  latest: "https://aaronpk.github.io/draft-parecki-oauth-jwt-grant-interaction-response/draft-parecki-oauth-jwt-grant-interaction-response.html"
 
 author:
  -

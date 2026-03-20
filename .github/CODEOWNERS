@@ -1,0 +1,3 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-parecki-oauth-jwt-grant-interaction-response.md aaron@parecki.com bcampbell@pingidentity.com max.ldp@alibaba-inc.com

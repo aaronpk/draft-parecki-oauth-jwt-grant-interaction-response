@@ -16,6 +16,7 @@
 /lib
 /node_modules/
 /versioned/
+.DS_Store
 Gemfile.lock
 archive.json
 draft-parecki-oauth-jwt-grant-interaction-response.xml

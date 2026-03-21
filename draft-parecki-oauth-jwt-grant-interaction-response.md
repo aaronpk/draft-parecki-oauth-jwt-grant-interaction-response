@@ -94,70 +94,7 @@ JWT Authorization Grant request to obtain the access token.
 
 {::boilerplate bcp14-tagged}
 
-
-# Interaction Response {#interaction-response}
-
-When the authorization server receives a valid JWT Authorization
-Grant request but determines that user interaction is required before
-an access token can be issued, it responds with an HTTP 200 response
-containing a JSON object with the following parameters:
-
-`interaction_uri`
-: REQUIRED. The URI that the client MUST launch (typically in the
-  user's browser) to allow the user to interact with the authorization
-  server. The URI MUST use the "https" scheme.
-
-`interval`
-: OPTIONAL. The minimum number of seconds that the client SHOULD
-  wait between polling requests to the token endpoint. If no value is
-  provided, the default is 5 seconds.
-
-`expires_in`
-: OPTIONAL. The number of seconds after which the interaction URI
-  and the associated authorization session will expire.
-
-The response MUST include a `Content-Type` header field set to
-`application/json`.
-
-~~~ http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "interaction_uri": "https://auth.example.com/interact/abc123",
-  "interval": 5,
-  "expires_in": 600
-}
-~~~
-
-## Interaction Pending Response {#interaction-pending-response}
-
-In addition to the error codes defined in {{Section 3.2.3 of OAUTH-2.1}},
-the following error codes are specified for use with the JWT
-Authorization Grant Interaction Response in token endpoint responses:
-
-`interaction_pending`
-: The authorization request is still pending as the end user hasn't
-  yet completed the user-interaction steps.  The
-  client SHOULD repeat the access token request to the token endpoint.
-  Before each new request,
-  the client MUST wait at least the number of seconds specified by
-  the `interval` parameter defined in {{interaction-response}}, or 5 seconds if none was provided,
-  and respect any increase in the polling interval required by the "slow_down" error.
-
-`slow_down`
-: A variant of `authorization_pending`, the authorization request is
-  still pending and polling should continue, but the interval MUST
-  be increased by 5 seconds for this and all subsequent requests.
-
-`access_denied`
-: The authorization request was denied.
-
-
-
-# Client Behavior {#client-behavior}
-
-## Token Request
+# Token Request
 
 The client makes a token request to the authorization server's token
 endpoint as defined in {{RFC7523}}, with the addition of an OPTIONAL
@@ -181,10 +118,84 @@ grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer
 &redirect_uri=https://client.example.org/callback
 ~~~
 
+
+
+# Token Endpoint Responses {#token-endpoint-responses}
+
+In addition to the error codes defined in {{Section 3.2.4 of OAUTH-2.1}},
+the following error codes are specified for use with the JWT
+Authorization Grant Interaction Response in token endpoint responses.
+
+## Interaction Required Response {#interaction-response}
+
+When the authorization server receives a valid JWT Authorization
+Grant request but determines that user interaction is required before
+an access token can be issued, it responds with an OAuth error
+response as defined in {{Section 3.2.4 of OAUTH-2.1}} as defined below:
+
+`error`
+: REQUIRED. `interaction_required`. Indicates that user interaction
+  is required, and the following additional parameters are defined
+  in the response.
+
+`interaction_uri`
+: REQUIRED. The URI that the client MUST launch (typically in the
+  user's browser) to allow the user to interact with the authorization
+  server. The URI MUST use the "https" scheme.
+
+`interval`
+: OPTIONAL. The minimum number of seconds that the client SHOULD
+  wait between polling requests to the token endpoint. If no value is
+  provided, the default is 5 seconds.
+
+`expires_in`
+: OPTIONAL. The number of seconds after which the interaction URI
+  and the associated authorization session will expire.
+
+The response MUST include a `Content-Type` header field set to
+`application/json`.
+
+~~~ http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "interaction_required",
+  "interaction_uri": "https://auth.example.com/interact/abc123",
+  "interval": 5,
+  "expires_in": 600
+}
+~~~
+
+## Interaction Pending Response {#interaction-pending-response}
+
+When user interaction is pending, and the client makes a subsequent
+token endpoint request, the authorization server responds with an
+OAuth error response as defined in {{Section 3.2.4 of OAUTH-2.1}}
+with one of the values defined below:
+
+`interaction_pending`
+: The authorization request is still pending as the end user hasn't
+  yet completed the user-interaction steps.  The
+  client SHOULD repeat the access token request to the token endpoint.
+  Before each new request,
+  the client MUST wait at least the number of seconds specified by
+  the `interval` parameter defined in {{interaction-response}}, or 5 seconds if none was provided,
+  and respect any increase in the polling interval required by the "slow_down" error.
+
+`slow_down`
+: A variant of `authorization_pending`, the authorization request is
+  still pending and polling should continue, but the interval MUST
+  be increased by 5 seconds for this and all subsequent requests.
+
+`access_denied`
+: The authorization request was denied.
+
+
 ## Handling the Interaction Response
 
 Upon receiving an interaction response as defined in
-{{interaction-response}}, the client MUST:
+{{token-endpoint-responses}}, the client MUST:
 
 1. Launch or redirect a browser to the `interaction_uri`.
 
@@ -256,14 +267,19 @@ consistent with {{Section 2.3.1 of OAUTH-2.1}}.
 
 
 
-
-
 # IANA Considerations
 
 TBD
 
 
 --- back
+
+# Appendix
+
+## Example Sequence
+
+
+
 
 # Acknowledgments
 {:numbered="false"}

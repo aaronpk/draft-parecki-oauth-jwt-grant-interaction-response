@@ -61,8 +61,8 @@ the original request.
 
 # Introduction
 
-The JWT Authorization Grant [[RFC7523]] and Identity Assertion Grant
-[[I-D.draft-ietf-oauth-identity-assertion-authz-grant]]
+The JWT Authorization Grant {{RFC7523}} and Identity Assertion Grant
+{{I-D.draft-ietf-oauth-identity-assertion-authz-grant}}
 enable clients to obtain access tokens without direct user
 approval at the authorization server. However, certain scenarios
 may require explicit user consent, even if the initial authorization

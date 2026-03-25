@@ -41,6 +41,7 @@ normative:
 
 informative:
   RFC8628:
+  I-D.draft-ietf-oauth-identity-assertion-authz-grant:
 
 ...
 
@@ -60,18 +61,31 @@ the original request.
 
 # Introduction
 
-The JWT Authorization Grant {{RFC7523}} allows a client to present a
-JWT assertion to an authorization server's token endpoint in exchange
-for an access token. In some scenarios, however, the authorization
-server cannot immediately issue an access token because user
-interaction is required -- for example, to obtain consent, collect
-additional information, or satisfy other policy requirements.
+The JWT Authorization Grant [[RFC7523]] and Identity Assertion Grant
+[[I-D.draft-ietf-oauth-identity-assertion-authz-grant]]
+enable clients to obtain access tokens without direct user
+approval at the authorization server. However, certain scenarios
+may require explicit user consent, even if the initial authorization
+can be obtained without user interaction:
+
+- AI Agent Authorization: Autonomous agents acting on behalf of
+  users need explicit consent for specific operations, not just
+  identity verification.
+
+- High-Risk Operations: Financial transactions, data deletion, or
+  other sensitive operations may require step-up consent.
+
+- Compliance Requirements: Regulatory frameworks (GDPR, etc.) may
+  require explicit, verifiable consent for certain activities.
+
+- Policy-Based Authorization: Fine-grained authorization policies
+  (e.g., "allow purchases up to $50") require user understanding and approval.
 
 Currently, if user interaction is needed, the authorization server
 has no standardized way to communicate this to the client within the
 JWT Authorization Grant flow. The client would typically receive an
-error response and would need to fall back to a different OAuth flow
-entirely.
+error response and would need to fall back to a traditional redirect-based
+OAuth flow, negating the benefits of using the JWT Authorization Grant.
 
 This specification defines an interaction response that the
 authorization server can return in place of an access token. The
@@ -250,6 +264,73 @@ authorization server MUST:
    {{Section 3.2.4 of OAUTH-2.1}}.
 
 
+# Complete Flow Diagram
+
+The diagram below is a non-normative example of using this specification
+in conjunction with the [[I-D.draft-ietf-oauth-identity-assertion-authz-grant]].
+
+~~~
+ +--------+     +--------+     +--------+     +----------+
+ |  User  |     | Client |     |  IdP   |     |   AS     |
+ |        |     | (Agent)|     |        |     |          |
+ +--------+     +--------+     +--------+     +----------+
+     |               |               |               |
+ (1) | Authenticate  |               |               |
+     |-------------->|               |               |
+     |               |               |               |
+ (2) |               | Token Exchange|               |
+     |               | (get ID-JAG)  |               |
+     |               |-------------->|               |
+     |               |               |               |
+ (3) |               | ID-JAG        |               |
+     |               |<--------------|               |
+     |               |               |               |
+ (4) |               | JWT Grant     |               |
+     |               | Request       |               |
+     |               |------------------------------>|
+     |               |               |               |
+ (5) |               |               |    Validate   |
+     |               |               |    & Decide:  |
+     |               |               |    Interaction|
+     |               |               |    Required   |
+     |               |               |               |
+ (6) |               | interaction_required          |
+     |               | + interaction_uri             |
+     |               |<------------------------------|
+     |               |               |               |
+ (7) |<--------------| Redirect to   |               |
+     |               | interaction   |               |
+     |               | page          |               |
+     |               |               |               |
+ (8) | Review &      |               |               |
+     | Approve       |               |               |
+     |---------------------------------------------->|
+     |               |               |               |
+ (9) |               |<------------------------------|
+     |               |   Redirect    |               |
+     |               | (via browser) |               |
+     |               |               |               |
+(10) |               | Retry JWT     |               |
+     |               | Grant Request |               |
+     |               |------------------------------>|
+     |               |               |               |
+(11) |               | Access Token  |               |
+     |               |<------------------------------|
+~~~
+
+1. User authenticates to the Client through the IdP, typically via OpenID Connect
+2. The Client exchanges the previously-obtained ID Token for an ID-JAG
+3. The IdP validates the request against the configured policy and returns an ID-JAG
+4. The Client presents the ID-JAG to the AS in a JWT Authorization Request
+5. The AS validates the ID-JAG, and determines that further interaction is required
+6. The AS returns the `interaction_required` response
+7. The client redirects the browser to the specified page
+8. The user visits the URL and confirms the request
+9. The AS redirects to the Client's `redirect_uri`
+10. The Client retries the JWT Authorization Request
+11. The AS validates the request, sees the user has confirmed, and issues an access token
+
+
 # Security Considerations
 
 ## Interaction URI Security
@@ -275,6 +356,30 @@ TBD
 --- back
 
 # Appendix
+
+## Use Cases
+
+### AI Agent with Browser Access
+
+An AI agent needs to perform operations on behalf of a user at a
+third-party service. The agent can redirect the user's browser to
+a consent page, then receive a callback when consent is complete.
+
+This differs from the Device Authorization Grant (RFC 8628) in
+that no polling is required - the redirect/callback model provides
+lower latency.
+
+### High-Risk Transaction Approval
+
+A client presents a valid JWT assertion but requests authorization
+for a high-value financial transaction. The AS determines that
+step-up consent is required before issuing the token.
+
+### Regulatory Compliance
+
+A client requests access to sensitive data. Regulatory requirements
+mandate that explicit, auditable consent must be obtained and
+recorded before access is granted.
 
 ## Example Sequence
 

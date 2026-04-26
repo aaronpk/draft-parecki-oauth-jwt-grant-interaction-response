@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-23T01:47:50.865781+00:00",
+  "timestamp": "2026-04-26T01:49:07.897696+00:00",
   "repo": "aaronpk/draft-parecki-oauth-jwt-grant-interaction-response",
   "labels": [
     {
@@ -49,6 +49,23 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDORr_Hj88AAAABARY4Mw",
+      "title": "Apply interaction-response to OAuth 2.0 Token Exchange as well, especially for ID-JAG issuance",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-jwt-grant-interaction-response/issues/1",
+      "state": "OPEN",
+      "author": "mcguinness",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The current draft is scoped to `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer`, but I think the same interaction pattern should also apply to OAuth 2.0 Token Exchange, particularly for deployments using ID-JAG.\n\nWhy this seems worth doing:\n\n`draft-parecki-oauth-jwt-grant-interaction-response` already positions itself as solving the case where a token endpoint needs user interaction instead of immediately issuing a token, and it already references ID-JAG in both the introduction and the complete flow example. However, in an ID-JAG deployment there are really two token-endpoint hops:\n\n1. Token Exchange at the IdP to obtain the ID-JAG\n2. JWT Bearer grant at the downstream AS to redeem the ID-JAG\n\nThe current draft covers (2), but in many deployments the need for interaction can arise at (1) just as naturally as at (2).\n\nExamples:\n- The IdP may need explicit user approval before issuing an ID-JAG for a downstream AS\n- The requested `scope`, `resource`, or `authorization_details` may trigger a policy that requires user review\n- The IdP may require step-up or fresh authentication in a way that is better expressed as \u201cgo here and complete interaction, then retry\u201d than as a terminal error\n- Agent/tool use cases seem especially relevant here: the enterprise IdP may want the user to review or approve the downstream delegation before minting the ID-JAG especially for fine-grained authorization requests with `authorization_details`\n\nWithout an interaction response for token exchange, the client typically gets an error and has to fall back to some separate front-channel flow. That loses a lot of the value this draft is trying to preserve: a standardized way for a token endpoint to say \u201cinteraction is needed; here is how to continue without changing protocols.\u201d\n\nThe mapping to Token Exchange seems straightforward:\n\n- The token exchange request could also allow an optional `redirect_uri`\n- If user interaction is required, the AS returns:\n  - `error=interaction_required`\n  - `interaction_uri`\n  - `interval`\n  - `expires_in`\n- The AS binds the interaction session to the original token exchange request, including things like:\n  - `requested_token_type`\n  - `subject_token` / `subject_token_type`\n  - `actor_token` / `actor_token_type` if present\n  - `audience`\n  - `resource`\n  - `scope`\n  - `authorization_details`\n  - client identity / client authentication context\n  - `redirect_uri` if present\n- The client polls or waits for redirect, then retries the same token exchange request\n- On success, the AS returns the normal token exchange response for that request, e.g. an ID-JAG with `issued_token_type=urn:ietf:params:oauth:token-type:id-jag`\n\nThis seems complementary to the current ID-JAG step-up work, not in conflict with it:\n- `insufficient_user_authentication` is useful when the client just needs a fresher/stronger subject token\n- an interaction response is useful when the AS needs an actual user visit to complete approval/review before continuing\n\nPossible ways to address this:\n- Generalize this draft from \u201cJWT Authorization Grant Interaction Response\u201d to a broader token-endpoint interaction response pattern\n- Or keep the current document focused on JWT bearer and add an explicit Token Exchange profile/section\n- Or define the response generically enough that both JWT bearer and Token Exchange can reuse it\n\nOne design question to think through is replay behavior for Token Exchange when the original `subject_token` may be short-lived or one-time-use. For token exchange, the AS may need to bind the interaction session to the validated original request rather than require byte-for-byte replay of the original token material.\n\nBut overall, this feels like a natural extension, and ID-JAG seems like one of the strongest motivating cases for it.",
+      "createdAt": "2026-04-23T03:06:26Z",
+      "updatedAt": "2026-04-23T03:06:26Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": []
 }
